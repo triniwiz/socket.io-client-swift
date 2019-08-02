@@ -40,7 +40,9 @@ import Foundation
 ///
 /// **NOTE**: The client is not thread/queue safe, all interaction with the socket should be done on the `manager.handleQueue`
 ///
-open class SocketIOClient: NSObject, SocketIOClientSpec {
+@objc(SocketIOClient)
+@objcMembers
+open class SocketIOClient : NSObject, SocketIOClientSpec {
     // MARK: Properties
 
     /// The namespace that this socket is currently connected to.

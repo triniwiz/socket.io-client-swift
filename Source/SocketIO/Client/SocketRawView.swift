@@ -31,6 +31,9 @@ import Foundation
 /// ```swift
 /// socket.rawEmitView.emit("myEvent", myObject)
 /// ```
+
+@objc(SocketRawView)
+@objcMembers
 public final class SocketRawView : NSObject {
     private unowned let socket: SocketIOClient
 
@@ -126,6 +129,8 @@ public final class SocketRawView : NSObject {
 /// ```swift
 /// ack.rawEmitView.with(myObject)
 /// ```
+@objc(SocketRawAckView)
+@objcMembers
 public final class SocketRawAckView : NSObject {
     private unowned let socket: SocketIOClient
     private let ackNum: Int

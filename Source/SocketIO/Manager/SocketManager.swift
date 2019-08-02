@@ -45,7 +45,9 @@ import Foundation
 ///
 /// **NOTE**: The manager is not thread/queue safe, all interaction with the manager should be done on the `handleQueue`
 ///
-open class SocketManager: NSObject, SocketManagerSpec, SocketParsable, SocketDataBufferable, ConfigSettable {
+@objc(SocketManager)
+@objcMembers
+open class SocketManager : NSObject, SocketManagerSpec, SocketParsable, SocketDataBufferable, ConfigSettable {
     private static let logType = "SocketManager"
 
     // MARK: Properties
@@ -185,6 +187,8 @@ open class SocketManager: NSObject, SocketManagerSpec, SocketParsable, SocketDat
     /// Connects the underlying transport and the default namespace socket.
     ///
     /// Override if you wish to attach a custom `SocketEngineSpec`.
+
+    @objc
     open func connect() {
         guard !status.active else {
             DefaultSocketLogger.Logger.log("Tried connecting an already active socket", type: SocketManager.logType)
@@ -235,6 +239,7 @@ open class SocketManager: NSObject, SocketManagerSpec, SocketParsable, SocketDat
     }
 
     /// Disconnects the manager and all associated sockets.
+    @objc
     open func disconnect() {
         DefaultSocketLogger.Logger.log("Manager closing", type: SocketManager.logType)
 
@@ -249,6 +254,7 @@ open class SocketManager: NSObject, SocketManagerSpec, SocketParsable, SocketDat
     /// releasing.
     ///
     /// - parameter socket: The socket to disconnect.
+    @objc
     open func disconnectSocket(_ socket: SocketIOClient) {
         engine?.send("1\(socket.nsp),", withData: [])
 
@@ -261,6 +267,7 @@ open class SocketManager: NSObject, SocketManagerSpec, SocketParsable, SocketDat
     /// releasing.
     ///
     /// - parameter nsp: The namespace to disconnect from.
+    @objc
     open func disconnectSocket(forNamespace nsp: String) {
         guard let socket = nsps.removeValue(forKey: nsp) else {
             DefaultSocketLogger.Logger.log("Could not find socket for \(nsp) to disconnect",
@@ -592,6 +599,7 @@ open class SocketManager: NSObject, SocketManagerSpec, SocketParsable, SocketDat
     ///
     /// - parameter nsp: The namespace for the socket.
     /// - returns: A `SocketIOClient` for the given namespace.
+    @objc
     open func socket(forNamespace nsp: String) -> SocketIOClient {
         assert(nsp.hasPrefix("/"), "forNamespace must have a leading /")
 
