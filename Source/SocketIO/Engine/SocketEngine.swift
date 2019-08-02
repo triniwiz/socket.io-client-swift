@@ -28,6 +28,7 @@ import Starscream
 
 /// The class that handles the engine.io protocol and transports.
 /// See `SocketEnginePollable` and `SocketEngineWebsocket` for transport specific methods.
+@objcMembers
 open class SocketEngine : NSObject, URLSessionDelegate, SocketEnginePollable, SocketEngineWebsocket, ConfigSettable {
     // MARK: Properties
 
@@ -690,7 +691,7 @@ open class SocketEngine : NSObject, URLSessionDelegate, SocketEnginePollable, So
 
     // Test Properties
 
-    func setConnected(_ value: Bool) {
+   @nonobjc func setConnected(_ value: Bool) {
         connected = value
     }
 }
