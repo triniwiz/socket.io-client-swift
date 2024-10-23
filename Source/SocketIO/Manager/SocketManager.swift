@@ -134,7 +134,7 @@ open class SocketManager : NSObject, SocketManagerSpec, SocketParsable, SocketDa
     private(set) var reconnectAttempts = -1
 
     private var _config: SocketIOClientConfiguration
-    private var currentReconnectAttempt = 0
+    internal var currentReconnectAttempt = 0
     private var reconnecting = false
 
     // MARK: Initializers
@@ -190,9 +190,8 @@ open class SocketManager : NSObject, SocketManagerSpec, SocketParsable, SocketDa
 
     @objc
     open func connect() {
-        guard !status.active else {
+        if status == .connected || (status == .connecting && currentReconnectAttempt == 0) {
             DefaultSocketLogger.Logger.log("Tried connecting an already active socket", type: SocketManager.logType)
-
             return
         }
 

@@ -30,7 +30,8 @@ import Starscream
 /// See `SocketEnginePollable` and `SocketEngineWebsocket` for transport specific methods.
 
 @objcMembers
-open class SocketEngine : NSObject, WebSocketDelegate, URLSessionDelegate, SocketEnginePollable, SocketEngineWebsocket, ConfigSettable {
+open class SocketEngine: NSObject, WebSocketDelegate, URLSessionDelegate,
+                         SocketEnginePollable, SocketEngineWebsocket, ConfigSettable {
 
     // MARK: Properties
 
@@ -112,6 +113,9 @@ open class SocketEngine : NSObject, WebSocketDelegate, URLSessionDelegate, Socke
 
     /// The url for WebSockets.
     public private(set) var urlWebSocket = URL(string: "http://localhost/")!
+
+    /// When `false`, the WebSocket `stream` will be configured with the useCustomEngine `false`.
+    public private(set) var useCustomEngine = true
 
     /// The version of engine.io being used. Default is three.
     public private(set) var version: SocketIOVersion = .three
@@ -309,7 +313,7 @@ open class SocketEngine : NSObject, WebSocketDelegate, URLSessionDelegate, Socke
             includingCookies: session?.configuration.httpCookieStorage?.cookies(for: urlPollingWithSid)
         )
 
-        ws = WebSocket(request: req, certPinner: certPinner, compressionHandler: compress ? WSCompression() : nil)
+        ws = WebSocket(request: req, certPinner: certPinner, compressionHandler: compress ? WSCompression() : nil, useCustomEngine: useCustomEngine)
         ws?.callbackQueue = engineQueue
         ws?.delegate = self
 
@@ -626,6 +630,8 @@ open class SocketEngine : NSObject, WebSocketDelegate, URLSessionDelegate, Socke
                 self.compress = true
             case .enableSOCKSProxy:
                 self.enableSOCKSProxy = true
+            case let .useCustomEngine(enable):
+                self.useCustomEngine = enable
             case let .version(num):
                 version = num
             default:
@@ -744,16 +750,22 @@ extension SocketEngine {
     /// - Parameters:
     ///   - event: WS Event
     ///   - _:
-    public func didReceive(event: WebSocketEvent, client _: WebSocket) {
+    public func didReceive(event: Starscream.WebSocketEvent, client: Starscream.WebSocketClient) {
         switch event {
         case let .connected(headers):
             wsConnected = true
-            client?.engineDidWebsocketUpgrade(headers: headers)
+            self.client?.engineDidWebsocketUpgrade(headers: headers)
             websocketDidConnect()
         case .cancelled:
             wsConnected = false
             websocketDidDisconnect(error: EngineError.canceled)
-        case let .disconnected(reason, code):
+        case .disconnected(_, _):
+            wsConnected = false
+            websocketDidDisconnect(error: nil)
+        case .viabilityChanged(false):
+            wsConnected = false
+            websocketDidDisconnect(error: nil)
+        case .peerClosed:
             wsConnected = false
             websocketDidDisconnect(error: nil)
         case let .text(msg):

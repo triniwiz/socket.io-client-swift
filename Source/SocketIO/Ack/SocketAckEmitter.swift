@@ -30,7 +30,7 @@ import Foundation
 /// **NOTE**: You should not store this beyond the life of the event handler.
 @objc(SocketAckEmitter)
 @objcMembers
-public final class SocketAckEmitter : NSObject {
+public final class SocketAckEmitter: NSObject {
     private unowned let socket: SocketIOClient
     private let ackNum: Int
 
@@ -103,7 +103,7 @@ public final class SocketAckEmitter : NSObject {
 /// ```
 @objc(OnAckCallback)
 @objcMembers
-public final class OnAckCallback : NSObject {
+public final class OnAckCallback: NSObject {
     private let ackNumber: Int
     private let binary: Bool
     private let items: [Any]
